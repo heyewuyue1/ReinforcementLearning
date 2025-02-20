@@ -1278,7 +1278,7 @@
     \tableofcontents
 \end{frame}
 
-\section{贝尔曼方程}
+\section{贝尔曼公式}
 
 \begin{frame}{标注说明}
     考虑以下单步过程：
@@ -1464,7 +1464,7 @@
     \]
 \end{frame}
 
-\begin{frame}{贝尔曼方程}
+\begin{frame}{贝尔曼公式}
     如何计算状态价值$v_{\pi}(s)$？
     \[
         \begin{aligned}
@@ -1474,13 +1474,13 @@
         \end{aligned}
     \]
     \begin{itemize}
-        \item 以上方程被称作贝尔曼方程。它描述了不同状态价值之间的关系。
+        \item 以上方程被称作贝尔曼公式。它描述了不同状态价值之间的关系。
         \item 它由两项组成：一项是即时奖励，一项是长期奖励。
-        \item 贝尔曼方程实际上是一组方程，每一个状态都有它对应的贝尔曼方程。
+        \item 贝尔曼公式实际上是一组方程，每一个状态都有它对应的贝尔曼公式。
     \end{itemize}
 \end{frame}
 
-\begin{frame}{贝尔曼方程}
+\begin{frame}{贝尔曼公式}
     考虑以下策略：
     \begin{center}
         \begin{tikzpicture}[scale=0.9]
@@ -1524,7 +1524,7 @@
             \node[scale=0.7, color=red] at (1.5, 0.75) {$r=1$};
         \end{tikzpicture}
     \end{center}
-    贝尔曼方程：
+    贝尔曼公式：
     \[
         \alert{v_\pi(s)}=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right], \quad \forall s\in\mathcal{S}
     \]
@@ -1538,8 +1538,8 @@
 
 \end{frame}
 
-\begin{frame}{贝尔曼方程}
-    贝尔曼方程：
+\begin{frame}{贝尔曼公式}
+    贝尔曼公式：
     \[
         \alert{v_\pi(s)}=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right], \quad \forall s\in\mathcal{S}
     \]
@@ -1584,7 +1584,7 @@
 \end{frame}
 
 \begin{frame}{动作价值}
-    贝尔曼方程：
+    贝尔曼公式：
     \begin{equation}
         \alert{v_\pi(s)}=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right]
     \end{equation}
@@ -1599,7 +1599,7 @@
 \end{frame}
 
 \begin{frame}{动作价值}
-    贝尔曼方程：
+    贝尔曼公式：
     \begin{equation}
         \alert{v_\pi(s)}=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right]
     \end{equation}
@@ -1716,8 +1716,23 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{贝尔曼最优方程}
-    
+\begin{frame}{小结}
+    关键概念和结论：
+    \begin{itemize}
+        \item 状态价值：$v_\pi(s)=\mathbb{E}[G_t|S_t=s]$
+        \item 动作价值：$q_\pi(s,a)=\mathbb{E}[G_t|S_t=s,A_t=a]$
+        \item 贝尔曼公式：
+        \[
+            \begin{aligned}
+                \alert{v_\pi(s)}&=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right] \\
+                &=\sum_a\pi(a|s)\alert{q_\pi(s,a)}
+            \end{aligned}
+        \]
+    \end{itemize}
 \end{frame}
+
+\section{最优策略和贝尔曼最优公式}
+
+
 
 \end{document}
