@@ -1,0 +1,31 @@
+# 编译输出文件
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.log
+*.out
+*.fdb_latexmk
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+
+# 额外生成的文件
+*.dvi
+*.xdv
+*.ps
+
+# 编辑器生成的备份/临时文件
+*~
+*.swp
+*.swo
+*.bak
+
+# 目录忽略
+_build/
+latex.out/
