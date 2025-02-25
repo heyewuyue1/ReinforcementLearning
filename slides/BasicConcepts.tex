@@ -946,7 +946,7 @@
     \]
     \textbf{回报}是这一条轨迹上所有的奖励之和。
     \[
-        \text{return}=0+(-1)+0+1=1
+        \text{return}=0+(-1)+0+1=0
     \]
 \end{frame}
 
@@ -1214,8 +1214,8 @@
         \item 马尔可夫性质：无记忆性质
         \[
             \begin{aligned}
-                p(s_{t+1}|a_t, s_t, \cdots, a0, s0)&=p(s_{t+1}|a_t,s_t) \\
-                p(r_{t+1}|a_t, s_t, \cdots, a0, s0)&=p(r_{t+1}|a_t,s_t)
+                p(s_{t+1}|a_t, s_t, \cdots, a_0, s_0)&=p(s_{t+1}|a_t,s_t) \\
+                p(r_{t+1}|a_t, s_t, \cdots, a_0, s_0)&=p(r_{t+1}|a_t,s_t)
             \end{aligned}
         \]
     \end{itemize}
