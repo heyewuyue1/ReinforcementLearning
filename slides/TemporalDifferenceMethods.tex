@@ -337,9 +337,163 @@
     输入的经验样本集合$\{(s_t, a_t, r_{t+1}, s_{t+1})\}_n$来源于哪里？
     \begin{itemize}
         \item 依据$\pi_t$生成的。在$t$时刻想要更新状态$s_t$中某一个动作的动作价值，就把$s_t$输入到当前的$\pi_t$中，得到$a_t$，然后通过与环境交互得到$(r_{t+1},s_{t+1})$；\alert{——{$\epsilon$}-greedy}
-        \item 依据一个别的任意策略$\pi_b$生成的。在$t$时刻想要更新状态$s_t$中某一个动作的动作价值，就把$s_t$输入到一个固定的策略$\pi_t$中，得到$a_t$，然后通过与环境交互得到$(r_{t+1},s_{t+1})$；\alert{——greedy}
+        \item 依据一个别的任意策略$\pi_b$生成的。在$t$时刻想要更新状态$s_t$中某一个动作的动作价值，就把$s_t$输入到一个固定的策略$\pi_b$中，得到$a_t$，然后通过与环境交互得到$(r_{t+1},s_{t+1})$；\alert{——greedy}
         \item 随机生成的。在$t$时刻想要更新状态$(s_t,a_t)$的动作价值，就直接通过与环境交互得到$(r_{t+1},s_{t+1})$；\alert{——greedy}
     \end{itemize}
+    Q-Learning可以从别的策略产生的经验中学习，这种特性叫做off-policy。之前我们所学的TD和Sarsa都是on-policy的算法。
+\end{frame}
+
+\begin{frame}{时序差分方法：Q-Learning}
+    例子：
+    \begin{itemize}
+        \item 问题：找到从\alert{所有的起点}走到终点的最优路径。
+        \item $r_{\text{boundary}}=r_{\text{forbidden}}=-1, r_{\text{target}}=1, r_\text{other}=0, \gamma=0.9, \alpha=0.1$
+    \end{itemize}
+    真实值：
+    \begin{center}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/OptimalPolicy.jpg}
+            \captionof{figure}{最优策略}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/OptimalStateValue.jpg}
+            \captionof{figure}{最优状态价值}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}{时序差分方法：Q-Learning}
+    生成策略、生成的经验样本通过off-policy方式的Q-Learning学习到的策略（$10^5$步）：
+    \begin{center}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e1policy.jpg}
+            \captionof{figure}{生成策略}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e1episode.jpg}
+            \captionof{figure}{生成策略的轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e1qpolicy.jpg}
+            \captionof{figure}{学习策略}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e1statevalueerror.jpg}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}{时序差分方法：Q-Learning}
+    探索的重要性：$10^5$步
+
+    如果生成策略探索得不充分，得到的经验样本就会很差。
+    \begin{center}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.5policy.jpg}
+            \captionof{figure}{生成策略$\epsilon=0.5$}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.5episode.jpg}
+            \captionof{figure}{生成策略的轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.5statevalueerror.jpg}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+        \hspace{1cm}
+    \end{center}
+\end{frame}
+
+\begin{frame}{时序差分方法：Q-Learning}
+    \begin{center}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1policy.jpg}
+            \captionof{figure}{生成策略$\epsilon=0.1$}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1episode.jpg}
+            \captionof{figure}{生成策略的轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1statevalueerror.jpg}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+    \end{center}
+
+    \begin{center}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1policy2.jpg}
+            \captionof{figure}{生成策略$\epsilon=0.1$}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1episode2.jpg}
+            \captionof{figure}{生成策略的轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.2\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/e0.1statevalueerror2.jpg}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}{小结}
+    本节所有算法都可以归纳为以下形式：
+    \[
+        \alert{q_{t+1}(s,a)=q_t(s,a)-\alpha[q_t(s,a)-q_{\text{target}}]}
+    \]
+    其中$q_{\text{target}}$是时序差分算法求解的目标。
+    \begin{table}[]
+        \begin{tabular}{@{}cc@{}}
+        \toprule
+        算法    & $q_{\text{target}}$\\ \midrule
+        Sarsa &  $r_{t+1}+\gamma q_t(s_{t+1}, a{t+1})$\\
+        n步Sarsa & $r_{t+1}+\gamma r_{t+2} + \cdots + \gamma^nq_t(s_{t+n},a_{t+n})$ \\
+        Monte Carlo &  $r_{t+1}+\gamma r_{t+2} + \cdots$\\
+        Q-Learning &  $r_{t+1}+\gamma \underset{a}{\max}q_t(s_{t+1}, a)$\\
+        \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}{小结}
+    所有时序差分算法都是解某种形式的贝尔曼公式的随机近似算法。
+    \begin{table}[]
+        \begin{tabular}{@{}cc@{}}
+        \toprule
+        算法    & 求解的方程\\ \midrule
+        Sarsa &  BE：$q_\pi(s,a)=\mathbb{E}[R_{t+1}+\gamma q_\pi(S_{t+1}, A_{t+1})|S_t=s,A_t=a]$\\
+        n步Sarsa & BE：$q_\pi(s,a)=\mathbb{E}[R_{t+1}+\gamma R_{t+1}+\cdots+\gamma^n q_\pi(S_{t+n}, A_{t+n})|S_t=s,A_t=a]$ \\
+        Monte Carlo &  BE：$q_\pi(s,a)=\mathbb{E}[R_{t+1}+\gamma R_{t+2}+\cdots|S_t=s,A_t=a]$\\
+        Q-Learning & \alert{BOE：$q_\pi(s,a)=\mathbb{E}[R_{t+1}+\gamma \underset{a}{\max}q_\pi(S_{t+1}, a)|S_t=s,A_t=a]$}\\
+        \bottomrule
+        \end{tabular}
+    \end{table}
 \end{frame}
 
 \end{section}
