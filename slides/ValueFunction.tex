@@ -11,4 +11,274 @@
     \end{figure}
 \end{frame}
 
+\begin{frame}{从表格表示到函数表示}
+    直到现在本节课涉及的所有动作价值和状态价值都是用\alert{表格}表示的。
+    \begin{itemize}
+        \item 状态价值：
+        \begin{table}[]
+            \begin{tabular}{@{}ccccc@{}}
+            \toprule
+            State & $s_1$& $s_2$& $\cdots$& $s_n$\\ \midrule
+            Value & $v_\pi(s_1)$& $v_\pi(s_2)$& $\cdots$& $v_\pi(s_n)$\\
+            \bottomrule
+            \end{tabular}
+        \end{table}
+        \item 动作价值：
+        \begin{table}[]
+            \begin{tabular}{@{}cccccc@{}}
+            \toprule
+             & $a_1$& $a_2$& $a_3$& $a_4$& $a_5$\\ \midrule
+            $s_1$ & $q_\pi(s_1,a_1)$& $q_\pi(s_1,a_2)$& $q_\pi(s_1,a_3)$& $q_\pi(s_1,a_4)$& $q_\pi(s_1,a_5)$\\
+            $\vdots$ &&&$\vdots$&&  \\
+            $s_9$  & $q_\pi(s_9,a_1)$& $q_\pi(s_9,a_2)$& $q_\pi(s_9,a_3)$& $q_\pi(s_9,a_4)$& $q_\pi(s_9,a_5)$\\
+            \bottomrule
+            \end{tabular}
+        \end{table}
+        \item \alert{优势}：直观，更容易理解分析
+        \item \alert{缺点}：难以应对大且\alert{连续}的状态空间。
+        
+        主要体现在两点：1）存储空间；2）泛化能力。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{从表格表示到函数表示}
+    比如，我们可以用一条直线来拟合所有的状态价值：
+    \begin{figure}
+        \begin{tikzpicture}
+            \draw[->] (0,0) -- (5,0) node[right] {$s$};
+            \draw[->] (0,0) -- (0,3) node[above] {$v_\pi(s)$};
+            \draw[domain=0:4,smooth,variable=\x] plot ({\x},{0.5*\x+0.5});
+            
+            % 补充的点
+            \filldraw (1,1.2) circle (2pt) node[above left] {};
+            \filldraw (2,1.3) circle (2pt) node[above left] {};
+            \filldraw (3,2.3) circle (2pt) node[above left] {};
+            \filldraw (4,2.2) circle (2pt) node[above left] {};
+
+            % 在直线末端添加方程
+            \node at (4.8,3) {$\hat{v}(s) = as + b$};
+
+            % 补充坐标轴上的信息
+            \draw[dashed] (1,0) -- (1,1.2) node[below] at (1,0) {$s_1$};
+            \draw[dashed] (2,0) -- (2,1.3) node[below] at (2,0) {$s_2$};
+            \draw[dashed] (3,0) -- (3,2.3) node[below] at (3,0) {$s_3$};
+            \draw[dashed] (4,0) -- (4,2.2) node[below] at (4,0) {$s_4$};
+        \end{tikzpicture}
+    \end{figure}
+    比如这条直线的方程是：
+    \[
+        \hat{v}(s,w)=as+b=[s,1]\begin{bmatrix}
+            a \\
+            b \\
+        \end{bmatrix}=\phi^T(s)w
+    \]
+    其中$w$是参数向量；$\phi(s)$是特征向量；$\hat{v}(s,w)$关于$w$是线性的。
+\end{frame}
+
+\begin{frame}{从表格表示到函数表示}
+    表格表示和函数表示有什么区别？
+    \begin{itemize}
+        \item 获取数据的方式不同：
+        \begin{itemize}
+            \item 表格：将行列作为索引，直接去表中查得相应数据
+            \item 函数：需要输入特征向量计算：$s\rightarrow\phi(s)\rightarrow\phi^T(s)w=\hat{v}(s,w)$。
+        \end{itemize}
+        \item 更新数据的方式不同：
+        \begin{itemize}
+            \item 表格：将行列作为索引，直接去表中更新相应数据
+            \item 函数：通过更新$w$来间接更新相应数据$\hat{v}(s,w)$。
+        \end{itemize}
+    \end{itemize}
+    优点：我们不需要再存储所有的$|\mathcal{S}|$个状态价值，只需要存储$w$中的参数。
+\end{frame}
+
+\begin{frame}{从表格表示到函数表示}
+    更新函数表示：
+    \begin{figure}
+        \centering
+        \begin{tikzpicture}
+            \draw[->] (0,0) -- (3,0) node[right] {$s$};
+            \draw[->] (0,0) -- (0,1.5) node[above] {$v_\pi(s)$};
+            
+            % 补充的点
+            \filldraw (0.5,0.5) circle (2pt) node[above left] {};
+            \filldraw (1.5,0.5) circle (2pt) node[above left] {};
+            \filldraw (2.5,0.5) circle (2pt) node[above left] {};
+
+            % 补充坐标轴上的信息
+            \draw[dashed] (0.5,0) -- (0.5,0.5) node[below] at (0.5,0) {$s_1$};
+            \draw[dashed] (1.5,0) -- (1.5,0.5) node[below] at (1.5,0) {$s_2$};
+            \draw[dashed] (2.5,0) -- (2.5,0.5) node[below] at (2.5,0) {$s_3$};
+            
+            \draw[->] (4,0.75) -- (7,0.75) node[above] at (5.5,0.75){更新$\hat{v}(s_3)$};
+
+            \draw[->] (8,0) -- (11,0) node[right] {$s$};
+            \draw[->] (8,0) -- (8,1.5) node[above] {$v_\pi(s)$};
+            
+            % 补充的点
+            \filldraw (8.5,0.5) circle (2pt) node[above left] {};
+            \filldraw (9.5,0.5) circle (2pt) node[above left] {};
+            \filldraw (10.5,1) circle (2pt) node[above left] {};
+
+            % 补充坐标轴上的信息
+            \draw[dashed] (8.5,0) -- (8.5,0.5) node[below] at (8.5,0) {$s_1$};
+            \draw[dashed] (9.5,0) -- (9.5,0.5) node[below] at (9.5,0) {$s_2$};
+            \draw[dashed] (10.5,0) -- (10.5,1) node[below] at (10.5,0) {$s_3$};
+        \end{tikzpicture}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \begin{tikzpicture}
+            \draw[->] (0,0) -- (3,0) node[right] {$s$};
+            \draw[->] (0,0) -- (0,1.5) node[above] {$v_\pi(s)$};
+            
+            \draw[domain=0.25:2.75,smooth,variable=\x] plot ({\x},{0.5});
+
+            % 补充坐标轴上的信息
+            \draw[dashed] (0.5,0) -- (0.5,0.5) node[below] at (0.5,0) {$s_1$};
+            \draw[dashed, color=red] (1.5,0) -- (1.5,0.5) node[below] at (1.5,0) {$s_2$};
+            \draw[dashed] (2.5,0) -- (2.5,0.5) node[below] at (2.5,0) {$s_3$};
+            
+            \draw[->] (4,0.75) -- (7,0.75) node[above] at (5.5,0.75){更新$w$};
+
+            \draw[->] (8,0) -- (11,0) node[right] {$s$};
+            \draw[->] (8,0) -- (8,1.5) node[above] {$v_\pi(s)$};
+            
+            \draw[domain=8.25:10.75,smooth,variable=\x] plot ({\x},{0.25*(\x-8.5)+0.5});
+
+            % 补充坐标轴上的信息
+            \draw[dashed] (8.5,0) -- (8.5,0.5) node[below] at (8.5,0) {$s_1$};
+            \draw[dashed, color=red] (9.5,0) -- (9.5,0.75) node[below] at (9.5,0) {$s_2$};
+            \draw[dashed] (10.5,0) -- (10.5,1) node[below] at (10.5,0) {$s_3$};
+        \end{tikzpicture}
+    \end{figure}
+    优点：泛化性增强。在上面的例子中，我们实际上是为了让直线更好的拟合$s_3$的状态价值去改变$w$，但是$s_2$的状态价值也跟着变化了。
+\end{frame}
+
+\begin{frame}{从表格表示到函数表示}
+   获得这些优点是有代价的。代价就是状态价值无法准确的被表示出来，这也是为什么这样的方法被称为值函数\alert{近似}方法。
+
+   我们可以通过更高维度的曲线来拟合状态价值：
+   \[
+        \hat{v}(s,w)=as^2+bs+c=[s^2,s,1]\begin{bmatrix}
+            a \\
+            b \\
+            c \\
+        \end{bmatrix}=\phi^T(s)w
+   \]
+   在这种情况下：
+   \begin{itemize}
+    \item 随着$w$和$\phi(s)$维度的增加，状态价值可以被拟合更精确。
+    \item 虽然$\hat{v}(s,w)$对于$s$是非线性的，但是对于$w$是线性的。非线性体现在$\phi(s)$中。
+   \end{itemize}
+\end{frame}
+
+\begin{frame}{从表格表示到函数表示}
+    快速小结：
+    \begin{itemize}
+     \item 核心：使用\alert{参数化的函数}来近似状态价值和动作价值：$\hat{v}(s,w)\approx v_\pi(s)$其中$w\in \mathbb{R}^m$是参数向量
+     \item 关键区别：如何获取和更新$v(s)$
+     \item 优点：
+    \begin{itemize}
+        \item 存储：$w$的维度明显低于$|S|$
+        \item 泛化性：当更新状态$s$的价值时，参数$w$会更新。所以一些其他状态的价值也会随着更新。
+    \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{目标函数}
+    正式定义问题：
+    \begin{itemize}
+        \item $\v_\pi(s)$是状态价值的\alert{真实值}；$\hat{v}(s,w)$时状态价值的\alert{估计值}。
+        \item 我们的目标是找到一个最优的参数$w$，使得$\hat{v}(s,w)$尽可能的接近$\v_\pi(s)$。
+    \end{itemize}
+    为了找到最优的$w$，我们需要两步：
+    \begin{itemize}
+        \item 第一步：定义一个目标函数（损失函数）来量化$\hat{v}(s,w)$和$\v_\pi(s)$之间的差距。
+        \item 第二步：通过优化算法来最小化目标函数。
+    \end{itemize}
+    \alert{目标函数：
+        \[
+            J(w)=\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2]
+        \]
+    }
+\end{frame}
+
+\begin{frame}{优化算法}
+    有了目标函数，下一步就是使用优化算法来优化它：
+    \begin{itemize}
+        \item 为了最小化目标函数$J(w)$，我们可以使用\alert{梯度下降法}。
+        \[
+            w_{k+1}=w_k-\alpha_k\nabla_w J(w_k)
+        \]
+        其中梯度：
+        \[
+            \begin{aligned}
+                \nabla_w J(w)&=\nabla_w\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2] \\
+                &=\mathbb{E}[\nabla_w(v_\pi(S)-\hat{v}(S,w))^2]\\
+                &=2\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))(-\nabla_w)\hat{v}(S,w)]\\
+                &=-2\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)]
+            \end{aligned}
+        \]
+        计算梯度需要涉及计算状态的期望。状态的分布是什么？
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{优化算法}
+    我们可以使用随机采样梯度来代替真实梯度：
+    \[
+        \begin{aligned}
+            w_{k+1}&=w_k+\alpha_k\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)] \\
+            &\downdownarrows \\
+            w_{t+1}&=w_t+\alpha_t(v_\pi(s_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \end{aligned}
+    \]
+    其中$s_t$是$S$的一个样本。在此已经把$2\alpha_t$简化为$\alpha_t$。
+    \begin{itemize}
+        \item 这些采样应当是按照状态的分布采样得来的，实际上可能不是。
+        \item 我们需要知道$v_\pi(s_t)$的值，实际上我们不知道。
+        \item 但是我们可以通过一些估计值来代替$v_\pi(s_t)$，至少让算法先可以实现。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{优化算法}
+    具体而言：
+    \begin{itemize}
+        \item 使用值近似的Monte Carlo算法：
+        
+        令$g_t$为从$s_t$出发的轨迹的折扣回报。那么$g_t$就可以用来估计$v_\pi(s_t)$。
+        \[
+            w_{t+1}=w_t+\alpha_t(g_t-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \]
+        \item 使用值近似的TD算法：
+        
+        按照TD算法的思路，我们也可以用$r_{t+1}+\gamma \hat{v}{s_{t+1},w_t}$来估计$v_\pi(s_t)$
+        \[
+            w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \hat{v}(s_{t+1},w_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \]
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{优化算法}
+    \begin{block}{使用值近似的TD算法}
+        \begin{algorithmic}[1]
+            \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。
+            \For{每一个轮次}
+                \State 依据$\pi_0(s_0)$从初始状态$s_0$开始选择动作状态$a_0$
+                \If{$s_t(t=0,1,2,\cdots)$不是目标状态}
+                    \State 更新$(s_t, a_t)$的动作价值：
+                    \[
+                        q_{t+1}(s_t,a_t)=q_t(s_t,a_t)-\alpha[q_t(s_t,a_t)-(r_{t+1}+\gamma q_t(s_{t+1},a_{t+1}))]
+                    \]
+                    \State \alert{更新策略$\pi_t(s_t)$}：
+                    \[
+                        \alert{\pi_{t+1}(s_t)=\arg\max_a q_{t+1}(s_t,a)}
+                    \]
+                \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{block}
+    这个算法只能用来估计某个策略下的状态价值，但是它依然是后续介绍的算法的基石。
+\end{frame}
+
 \end{section}
