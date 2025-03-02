@@ -2,7 +2,7 @@
     \tableofcontents
 \end{frame}
 
-\begin{section}{值函数近似\alert{（Deep Q-Learning）}}
+\begin{section}{值函数近似方法\alert{（Deep Q-Learning）}}
 
 \begin{frame}{从表格表示到函数表示}
     \begin{figure}
@@ -263,22 +263,151 @@
     \begin{block}{使用值近似的TD算法}
         \begin{algorithmic}[1]
             \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。
-            \For{每一个轮次}
-                \State 依据$\pi_0(s_0)$从初始状态$s_0$开始选择动作状态$a_0$
-                \If{$s_t(t=0,1,2,\cdots)$不是目标状态}
-                    \State 更新$(s_t, a_t)$的动作价值：
-                    \[
-                        q_{t+1}(s_t,a_t)=q_t(s_t,a_t)-\alpha[q_t(s_t,a_t)-(r_{t+1}+\gamma q_t(s_{t+1},a_{t+1}))]
-                    \]
-                    \State \alert{更新策略$\pi_t(s_t)$}：
-                    \[
-                        \alert{\pi_{t+1}(s_t)=\arg\max_a q_{t+1}(s_t,a)}
-                    \]
-                \EndIf
+            \State \textbf{目标：}学习到策略$\pi$的真实状态价值。
+            \For{每一个策略$\pi$产生的轨迹$\{(s_t,r_{t+1},s_{t+1})\}_t$}
+                \For{每一个经验样本$(s_t,r_{t+1},s_{t+1})$}
+                    \State 更新参数$w$（一般情况）：
+
+                    $w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \hat{v}(s_{t+1},w_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)$
+                    \State 更新参数$w$（线性情况）：
+
+                    $w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \phi^T(s_{t+1})w_t-\phi^T(s_t)w_t)\phi(s_t)$
+                \EndFor
             \EndFor
         \end{algorithmic}
     \end{block}
-    这个算法只能用来估计某个策略下的状态价值，但是它依然是后续介绍的算法的基石。
+    虽然这个算法只能用来估计某个策略下的状态价值，但是它依然是后续介绍的算法的基础。
+\end{frame}
+
+\begin{frame}{优化算法}
+    关于值近似TD算法的快速小结：
+    \begin{itemize}
+        \item[1）] 从目标方程出发：
+        \[
+            J(w)=\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2]
+        \]
+        \item[2）] 梯度下降法：
+        \[
+            w_{t+1}=w_t+\alpha_t(v_\pi(s_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \]
+        \item[3）] 将真实的价值函数用估计值代替：  
+        \[
+            w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \hat{v}(s_{t+1},w_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \]
+    \end{itemize}
+    数学上并不严谨，有兴趣的同学可以自行推导一下。问题出在3）当我们用估计值代替真实的价值之后，我们实际上优化的目标方程并不是1）。
+\end{frame}
+
+\begin{frame}{值近似Sarsa算法}
+    目前为止我们主要考虑的是状态价值的估计，即：
+    \[
+        \hat{v}(s)\approx v_\pi(s),\quad \forall s\in \mathcal{S}
+    \]
+    为了找最优策略，我们需要估计动作价值。
+
+    值近似Sarsa算法：
+    \alert{\[
+        w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \hat{q}(s_{t+1},a_{t+1},w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)
+    \]}
+    和之前的值近似TD算法几乎一样，只是把$\hat{v}$替换成了$\hat{q}$。
+\end{frame}
+
+\begin{frame}{值近似Sarsa算法}
+    \begin{algorithmic}[1]
+        \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
+        \State \textbf{目标 ：}找到一个让智能体从一个特定的起点$s_0$出发，到达终点的最优策略。
+        \For{每一次生成轨迹}
+            \State $a_0\leftarrow\pi_0(s_0)$
+            \While{$s_t$不是目标状态}
+                \State 根据$(s_t,a_t)$收集经验样本$(r_{t+1}, s_{t+1},a_{t+1})$
+                \State 更新动作价值：
+
+                $w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \hat{q}(s_{t+1},a_{t+1},w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)$
+                \State 更新策略：
+                \[
+                    \pi(a|s_t)=\begin{cases}
+                        1-\frac{\epsilon}{|\mathcal{A}|}(|\mathcal{A}|-1),\quad a=\arg\max_{a}\hat{q}(s_t,a,w_{t+1}) \\
+                        \frac{\epsilon}{|\mathcal{A}|},\quad a \neq \arg\max_{a}\hat{q}(s_t,a,w_{t+1})
+                    \end{cases}
+                \]
+                \State $s_{t+1}\leftarrow s_t$，$a_{t+1}\leftarrow a_t$
+            \EndWhile
+        \EndFor
+    \end{algorithmic}
+\end{frame}
+
+\begin{frame}{值近似Sarsa算法}
+    例子：
+    \begin{itemize}
+        \item 使用\alert{线性函数}进行值近似的Sarsa：$\hat{q}(s,a,w)=\phi^T(s,a)w$
+        \item $\gamma=0.9,\epsilon=0.1,r_\text{boundary}=r_\text{forbidden}=-10, r_\text{target}=1,\alpha=0.001$
+    \end{itemize}
+    \begin{center}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/valuesarsaepisode.jpg}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/valuesarsapolicy.jpg}
+        \end{minipage}
+    \end{center}
+    
+\end{frame}
+
+\begin{frame}{值近似Q-Learning算法}
+    与Sarsa类似，Q-Learning也可以通过值近似推广。
+
+    值近似Q-Learning算法：
+    \alert{\[
+        w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)
+    \]}
+    和之前的值近似Sarsa算法几乎一样，只是把$\hat{q}(s_{t+1},a_{t+1},w_t)$替换成了$\underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)$。
+\end{frame}
+
+\begin{frame}{值近似Q-Learning算法}
+    \begin{algorithmic}[1]
+        \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
+        \State \textbf{目标 ：}找到一个让智能体从一个特定的起点$s_0$出发，到达终点的最优策略。
+        \For{每一次生成轨迹}
+            \State $a_0\leftarrow\pi_0(s_0)$
+            \While{$s_t$不是目标状态}
+                \State 根据$(s_t,a_t)$收集经验样本$(r_{t+1}, s_{t+1})$
+                \State 更新动作价值：
+
+                $w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)$
+                \State 更新策略：
+                \[
+                    \pi(a|s_t)=\begin{cases}
+                        1-\frac{\epsilon}{|\mathcal{A}|}(|\mathcal{A}|-1),\quad a=\arg\max_{a}\hat{q}(s_t,a,w_{t+1}) \\
+                        \frac{\epsilon}{|\mathcal{A}|},\quad a \neq \arg\max_{a}\hat{q}(s_t,a,w_{t+1})
+                    \end{cases}
+                \]
+                \State $s_{t+1}\leftarrow s_t$，$a_{t+1}\leftarrow a_t$
+            \EndWhile
+        \EndFor
+    \end{algorithmic}
+\end{frame}
+
+\begin{frame}{值近似Sarsa算法}
+    例子：
+    \begin{itemize}
+        \item 使用\alert{线性函数}进行值近似的Sarsa：$\hat{q}(s,a,w)=\phi^T(s,a)w$
+        \item $\gamma=0.9,\epsilon=0.1,r_\text{boundary}=r_\text{forbidden}=-10, r_\text{target}=1,\alpha=0.001$
+    \end{itemize}
+    \begin{center}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/valuesarsaepisode.jpg}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.3\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/valuesarsapolicy.jpg}
+        \end{minipage}
+    \end{center}
+    
 \end{frame}
 
 \end{section}

@@ -29,3 +29,5 @@
 # 目录忽略
 _build/
 latex.out/
+
+.DS_Store

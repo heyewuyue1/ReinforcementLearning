@@ -312,20 +312,23 @@
             \setlength{\baselineskip}{0.5\baselineskip}
             \For{对于收集到的每一个经验样本$(s_t, a_t, r_{t+1}, s_{t+1})$}
                 \State 更新$(s_t, a_t)$的动作价值：
-                \[
+
+                $
                     q_{t+1}(s_t,a_t)=q_t(s_t,a_t)-\alpha[q_t(s_t,a_t)-(r_{t+1}+\gamma \underset{a}{\max}q_t(s_{t+1},a))]
-                \]
+                $
                 \State 更新策略$\pi_t(s_t)$（greedy）：
-                \[
+
+                $
                     \pi_{t+1}(s_t)=\arg\max_a q_{t+1}(s_t,a)
-                \]
+                $
                 \State 更新策略$\pi_t(s_t)$（$\epsilon$-greedy）：
-                \[
+                
+                $
                     \pi_{t+1}(a|s_{t})=\begin{cases}
                         1-\frac{\epsilon}{|\mathcal{A}|}(|\mathcal{A}|-1),\quad a=\arg\max_{a}q_{t+1}(s_t,a) \\
                         \frac{\epsilon}{|\mathcal{A}|},\quad a \neq \arg\max_{a}q_{t+1}(s_t,a)
                     \end{cases}
-                \]
+                $
             \EndFor
         \end{algorithmic}
     \end{block}
