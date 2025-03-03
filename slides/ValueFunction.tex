@@ -361,7 +361,7 @@
 
     值近似Q-Learning算法：
     \alert{\[
-        w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)
+        w_{t+1}=w_t+\alpha_t\left[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)\right]\nabla_w\hat{q}(s_t,a_t,w_t)
     \]}
     和之前的值近似Sarsa算法几乎一样，只是把$\hat{q}(s_{t+1},a_{t+1},w_t)$替换成了$\underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)$。
 \end{frame}
@@ -390,7 +390,7 @@
     \end{algorithmic}
 \end{frame}
 
-\begin{frame}{值近似Sarsa算法}
+\begin{frame}{值近似Q-Learning算法}
     例子：
     \begin{itemize}
         \item 使用\alert{线性函数}进行值近似的Sarsa：$\hat{q}(s,a,w)=\phi^T(s,a)w$
@@ -399,15 +399,233 @@
     \begin{center}
         \begin{minipage}{0.3\textwidth}
             \centering
-            \includegraphics[width=\linewidth]{assets/valuesarsaepisode.jpg}
+            \includegraphics[width=\linewidth]{assets/valueqlearningepisode.png}
         \end{minipage}
         \hspace{1cm}
         \begin{minipage}{0.3\textwidth}
             \centering
-            \includegraphics[width=\linewidth]{assets/valuesarsapolicy.jpg}
+            \includegraphics[width=\linewidth]{assets/valueqlearningpolicy.png}
         \end{minipage}
     \end{center}
     
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    \begin{itemize}
+        \item 最早将神经网络与强化学习的结合的算法之一（不是第一）。
+        \item 其中神经网络的作用是作为一个非线性方程的拟合器
+        \item 与下列算法不同：
+        \[
+            w_{t+1}=w_t+\alpha_t\left[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)\right]\nabla_w\hat{q}(s_t,a_t,w_t)
+        \]
+        因为训练神经网络的方式与之前的方法不同。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    Deeo Q-Learning的目标函数（损失函数）：
+    \[
+        \begin{aligned}
+            w_{t+1}&=w_t+\alpha_t\left[\alert{r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)}\right]\nabla_w\hat{q}(s_t,a_t,w_t)\\
+            &\downdownarrows \\
+            J(w)&=\mathbb{E}\left[\alert{\left(R+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2}\right]\\
+        \end{aligned}
+    \]
+    其中$(S,A,R,S')$都是随机变量。
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    如何最小化这个目标函数？梯度下降法！
+    \begin{itemize}
+        \item 如何计算目标函数的梯度？
+        \item 目标函数：
+        \[
+            J(w)=\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2\right]
+        \]
+        其中参数$w$不但出现在了$\hat{q}(S,A,w)$中，还出现在了
+        \[
+            y\doteq R+\gamma\underset{a\in \mathcal{A}(S')}{\max}\hat{q}(S',a,w)
+        \]
+        \item 但是
+        \[
+            \nabla_wy\alert{\neq} \gamma\underset{a\in \mathcal{A}(S')}{\max}\nabla_w\hat{q}(S',a,w)
+        \]
+        \item 为了解决这个问题，我们可以假设在$y$中的$w$是不变的（至少对于一段短时间来说，比如5-10个经验样本）。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    为了解决这个问题，我们可以引入两个神经网络：
+    \begin{itemize}
+        \item 一个是\textcolor{blue}{主网络$\hat{q}(s,a,w)$}
+        \item 另一个是\alert{目标网络$\hat{q}(s,a,w_T)$}
+    \end{itemize}
+    如此，我们可以将目标函数可以退化为：
+    \[
+        J=\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right)^2\right]
+    \]
+    其中$w_T$是目标网络中的参数。
+
+    当$w_T$固定时，$J$的梯度就可以按照以下公式计算了：
+    \[
+        \nabla_wJ=-2\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right) \textcolor{blue}{\nabla_w\hat{q}(S,A,w)}\right]
+    \]
+    Deep Q-Learning的基本思想就是使用梯度下降法最小化目标函数。
+\end{frame}
+
+\begin{frame}{Deep Q-Learning——双网络}
+    \textbf{改进点1：}\alert{双网络，一个目标网络和一个主网络}
+
+    \textbf{实现方式}：
+    \begin{itemize}
+        \item 令$w$和$w_T$分别是主网络和目标网络的参数，将它们初始化为一样的值。
+        \item 每一轮迭代时，从经验池中取出一小批经验样本$\{(s,a,r,s')\}$
+        \item 对于其中的每一个经验样本$(s,a,r,s')$计算目标值：
+        \[
+            y_T\doteq r+\gamma \underset{a\in \mathcal{A}(s_{S'})}{\max}\hat{q}(s',a,w_T)
+        \]
+        \item 得到一小批数据：$\{(s,a,y_T)\}$
+        \item 用$\{(s,a,y_T)\}$训练主网络最小化$(y_T-\hat{q}(s,a,w))^2$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning——经验重放}
+    \textbf{改进点1：}\alert{经验重放}
+
+    \textbf{什么是经验重放?}
+
+    \textbf{实现方式}：
+    \begin{itemize}
+        \item 在我们采集了足够多的经验样本之后，我们\alert{并不按照采集他们的顺序去使用它们}。
+        \item 而是把它们存在一个叫做\alert{经验池}的集合中\alert{$\mathcal{B}\doteq\{(s,a,r,s')\}$}
+        \item 每当我们需要一小批数据的时候，我们就从这个集合中进行随机采样
+        \item 我们的采样应该遵循均匀分布。（？）
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    \begin{algorithmic}[1]
+        \State \textbf{初始化：}两个具有相同初始参数的网络$w$和$w_T$。
+        \State \textbf{目标 ：}从一个任意策略$\pi_b$出发学习出所有的最优动作价值。
+        \State 将$\pi_b$产生的经验样本存入经验池$\mathcal{B}=\{(s,a,r,s')\}$
+        \For{每一次迭代}
+            \State 从$\mathcal{B}$中按照均匀分布采样出一小批经验样本
+            \For{每一个经验样本$(s,a,r,s')$}
+                \State 使用目标网络计算最优动作价值$y_T= r+\gamma \underset{a\in \mathcal{A}(s_{S'})}{\max}\hat{q}(s',a,w_T)$
+            \EndFor
+            \State 使用这一小批数据更新主网络，使得$(y_T-\hat{q}(s,a,w))^2$最小
+            \State 每过$k$轮将$w_T$设置为$w$。
+        \EndFor
+    \end{algorithmic}
+    \begin{itemize}
+        \item 为什么没有策略更新环节？
+        \item 与论文中的输入输出有所不同。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    例子：
+    \begin{itemize}
+        \item 只用了\alert{一条}轨迹来生成经验样本。
+        \item 这条轨迹有1000步。
+        \item 产生这条轨迹的策略就是在每一个状态都均匀的随机选择一个动作。
+        \item 使用的神经网络只有一层隐藏全连接层+非线性激活函数用来拟合$\hat{q}(s,a,w)$，这一层有100个神经元。
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Deep Q-Learning}
+    \begin{center}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100behavior.png}
+            \captionof{figure}{行为策略}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN1000episode.png}
+            \captionof{figure}{轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN1000policy.png}
+            \captionof{figure}{习得策略}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{0.22\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN1000TDerror.png}
+            \captionof{figure}{TD Error}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.22\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN1000statevalueerror.png}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+
+\begin{frame}{Deep Q-Learning}
+    如果只有100步呢？
+    \begin{center}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100behavior.png}
+            \captionof{figure}{行为策略}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100episode.png}
+            \captionof{figure}{轨迹}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.18\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100policy.png}
+            \captionof{figure}{习得策略}
+        \end{minipage}
+    \end{center}
+    \begin{center}
+        \begin{minipage}{0.22\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100TDerror.png}
+            \captionof{figure}{TD Error}
+        \end{minipage}
+        \hspace{1cm}
+        \begin{minipage}{0.22\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{assets/DQN100statevalueerror.png}
+            \captionof{figure}{状态价值误差}
+        \end{minipage}
+    \end{center}
+\end{frame}
+
+\begin{frame}{小结}
+    值近似方法：
+    \begin{itemize}
+        \item 值近似TD算法
+        \[
+            w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \hat{v}(s_{t+1},w_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
+        \]
+        \item 值近似Sarsa算法
+        \[
+            w_{t+1}=w_t+\alpha_t[r_{t+1}+\gamma \hat{q}(s_{t+1},a_{t+1},w_t)-\hat{q}(s_t,a_t,w_t)]\nabla_w\hat{q}(s_t,a_t,w_t)
+        \]
+        \item 值近似Q-Learning算法
+        \[
+            w_{t+1}=w_t+\alpha_t\left[r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)\right]\nabla_w\hat{q}(s_t,a_t,w_t)
+        \]
+        \item Deep Q-Learning
+        \begin{itemize}
+            \item 双网络
+            \item 经验重放
+        \end{itemize}
+    \end{itemize}
 \end{frame}
 
 \end{section}
