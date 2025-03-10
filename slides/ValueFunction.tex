@@ -176,7 +176,7 @@
 \begin{frame}{从表格表示到函数表示}
     快速小结：
     \begin{itemize}
-     \item 核心：使用\alert{参数化的函数}来近似状态价值和动作价值：$\hat{v}(s,w)\approx v_\pi(s)$其中$w\in \mathbb{R}^m$是参数向量
+     \item 核心：使用\alert{参数化的函数}来近似状态价值和动作价值：$\hat{v}(s,w)\approx v_\pi(s)$其中$w\in \mathbbm{R}^m$是参数向量
      \item 关键区别：如何获取和更新$v(s)$
      \item 优点：
     \begin{itemize}
@@ -199,7 +199,7 @@
     \end{itemize}
     \alert{目标函数：
         \[
-            J(w)=\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2]
+            J(w)=\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))^2]
         \]
     }
 \end{frame}
@@ -214,10 +214,10 @@
         其中梯度：
         \[
             \begin{aligned}
-                \nabla_w J(w)&=\nabla_w\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2] \\
-                &=\mathbb{E}[\nabla_w(v_\pi(S)-\hat{v}(S,w))^2]\\
-                &=2\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))(-\nabla_w)\hat{v}(S,w)]\\
-                &=-2\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)]
+                \nabla_w J(w)&=\nabla_w\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))^2] \\
+                &=\mathbbm{E}[\nabla_w(v_\pi(S)-\hat{v}(S,w))^2]\\
+                &=2\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))(-\nabla_w)\hat{v}(S,w)]\\
+                &=-2\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)]
             \end{aligned}
         \]
         计算梯度需要涉及计算状态的期望。状态的分布是什么？
@@ -228,7 +228,7 @@
     我们可以使用随机采样梯度来代替真实梯度：
     \[
         \begin{aligned}
-            w_{k+1}&=w_k+\alpha_k\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)] \\
+            w_{k+1}&=w_k+\alpha_k\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))\nabla_w\hat{v}(S,w)] \\
             &\downdownarrows \\
             w_{t+1}&=w_t+\alpha_t(v_\pi(s_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
         \end{aligned}
@@ -284,7 +284,7 @@
     \begin{itemize}
         \item[1）] 从目标方程出发：
         \[
-            J(w)=\mathbb{E}[(v_\pi(S)-\hat{v}(S,w))^2]
+            J(w)=\mathbbm{E}[(v_\pi(S)-\hat{v}(S,w))^2]
         \]
         \item[2）] 梯度下降法：
         \[
@@ -368,7 +368,7 @@
 
 \begin{frame}{值近似Q-Learning算法}
     \begin{algorithmic}[1]
-        \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
+        \State \textbf{初始化：}一个对$w$可微的函数$\hat{q}(s,a,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
         \State \textbf{目标 ：}找到一个让智能体从一个特定的起点$s_0$出发，到达终点的最优策略。
         \For{每一次生成轨迹}
             \State $a_0\leftarrow\pi_0(s_0)$
@@ -393,7 +393,7 @@
 \begin{frame}{值近似Q-Learning算法}
     例子：
     \begin{itemize}
-        \item 使用\alert{线性函数}进行值近似的Sarsa：$\hat{q}(s,a,w)=\phi^T(s,a)w$
+        \item 使用\alert{线性函数}进行值近似的Q-Learning：$\hat{q}(s,a,w)=\phi^T(s,a)w$
         \item $\gamma=0.9,\epsilon=0.1,r_\text{boundary}=r_\text{forbidden}=-10, r_\text{target}=1,\alpha=0.001$
     \end{itemize}
     \begin{center}
@@ -423,12 +423,12 @@
 \end{frame}
 
 \begin{frame}{Deep Q-Learning}
-    Deeo Q-Learning的目标函数（损失函数）：
+    Deep Q-Learning的目标函数（损失函数）：
     \[
         \begin{aligned}
             w_{t+1}&=w_t+\alpha_t\left[\alert{r_{t+1}+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(s_{t+1},a,w_t)-\hat{q}(s_t,a_t,w_t)}\right]\nabla_w\hat{q}(s_t,a_t,w_t)\\
             &\downdownarrows \\
-            J(w)&=\mathbb{E}\left[\alert{\left(R+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2}\right]\\
+            J(w)&=\mathbbm{E}\left[\alert{\left(R+\gamma \underset{a\in \mathcal{A}(s_{t+1})}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2}\right]\\
         \end{aligned}
     \]
     其中$(S,A,R,S')$都是随机变量。
@@ -440,7 +440,7 @@
         \item 如何计算目标函数的梯度？
         \item 目标函数：
         \[
-            J(w)=\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2\right]
+            J(w)=\mathbbm{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\hat{q}(S',a,w)-\hat{q}(S,A,w)\right)^2\right]
         \]
         其中参数$w$不但出现在了$\hat{q}(S,A,w)$中，还出现在了
         \[
@@ -462,13 +462,13 @@
     \end{itemize}
     如此，我们可以将目标函数可以退化为：
     \[
-        J=\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right)^2\right]
+        J=\mathbbm{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right)^2\right]
     \]
     其中$w_T$是目标网络中的参数。
 
     当$w_T$固定时，$J$的梯度就可以按照以下公式计算了：
     \[
-        \nabla_wJ=-2\mathbb{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right) \textcolor{blue}{\nabla_w\hat{q}(S,A,w)}\right]
+        \nabla_wJ=-2\mathbbm{E}\left[\left(R+\gamma \underset{a\in \mathcal{A}(S')}{\max}\alert{\hat{q}(S',a,w_T)}-\textcolor{blue}{\hat{q}(S,A,w)}\right) \textcolor{blue}{\nabla_w\hat{q}(S,A,w)}\right]
     \]
     Deep Q-Learning的基本思想就是使用梯度下降法最小化目标函数。
 \end{frame}
@@ -490,7 +490,7 @@
 \end{frame}
 
 \begin{frame}{Deep Q-Learning——经验重放}
-    \textbf{改进点1：}\alert{经验重放}
+    \textbf{改进点2：}\alert{经验重放}
 
     \textbf{什么是经验重放?}
 

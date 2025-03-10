@@ -44,7 +44,7 @@
 \begin{frame}{状态价值}
     $G_t$的数学期望值被称为\textbf{状态价值}。
     \[
-        v_{\pi}(s)=\mathbb{E}[G_t|S_t=s]
+        v_{\pi}(s)=\mathbbm{E}[G_t|S_t=s]
     \]
     \begin{itemize}
         \item 它是一个$s$的函数。它是当状态处于$s$时的条件期望。
@@ -192,7 +192,7 @@
     如何计算状态价值$v_{\pi}(s)$？
     \[
         \begin{aligned}
-            \alert{v_\pi(s)}&=\mathbb{E}[R_{t+1}|S_t=s]+\gamma\mathbb{E}[G_{t+1}|S_t=s] \\
+            \alert{v_\pi(s)}&=\mathbbm{E}[R_{t+1}|S_t=s]+\gamma\mathbbm{E}[G_{t+1}|S_t=s] \\
             &=\sum_a\pi(a|s)\sum_r p(r|s,a)r+\gamma\sum_a\pi(a|s)\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')} \\
             &=\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v_{\pi}(s')}\right], \quad \forall s\in\mathcal{S}
         \end{aligned}
@@ -257,7 +257,7 @@
         \item $\pi(a=a_3|s_1)=1$且$\pi(a\neq a_3|s_1)=0$
         \item $p(s'=s_3|s_1,a_3)=1$且$p(s'|s_1,a\neq a_3)=0$
         \item $p(r=0|s_1,a_3)=1$且$p(r\neq 0|s_1, a_3)=0$
-        \item $v_\pi(s_1)=0+v_\pi(s_3)$
+        \item $v_\pi(s_1)=0+\gamma v_\pi(s_3)$
     \end{itemize}
 
 \end{frame}
@@ -416,7 +416,7 @@
 \begin{frame}{动作价值}
     定义：
     \[
-        q_\pi(s,a)=\mathbb{E}[G_t|S_t=s,A_t=a]
+        q_\pi(s,a)=\mathbbm{E}[G_t|S_t=s,A_t=a]
     \]
     \begin{itemize}
         \item $q$是一个“状态-动作”对的函数。
@@ -424,7 +424,7 @@
     \end{itemize}
     它服从条件期望的公式：
     \begin{equation}
-        \mathbb{E}[G_t|S_t=s]=\sum_a\mathbb{E}[G_t|S_t=s,A_t=a]\pi(a|s)
+        \mathbbm{E}[G_t|S_t=s]=\sum_a\mathbbm{E}[G_t|S_t=s,A_t=a]\pi(a|s)
     \end{equation}
     所以:
     \begin{equation}
@@ -553,8 +553,8 @@
 \begin{frame}{小结}
     关键概念和结论：
     \begin{itemize}
-        \item 状态价值：$v_\pi(s)=\mathbb{E}[G_t|S_t=s]$
-        \item 动作价值：$q_\pi(s,a)=\mathbb{E}[G_t|S_t=s,A_t=a]$
+        \item 状态价值：$v_\pi(s)=\mathbbm{E}[G_t|S_t=s]$
+        \item 动作价值：$q_\pi(s,a)=\mathbbm{E}[G_t|S_t=s,A_t=a]$
         \item 贝尔曼公式：
         \[
             \begin{aligned}
