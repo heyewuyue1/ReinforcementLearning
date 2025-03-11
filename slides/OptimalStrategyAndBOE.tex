@@ -80,14 +80,14 @@
         v=f(v)
     \]
     如何求解？
-    \begin{block}{压缩映射定理}
+    \begin{theorem}[压缩映射定理]
         对于任何具有$x=f(x)$形式的方程，如果$f$是一个\textit{压缩映射}，那么：
         \begin{itemize}
             \item 解存在性：一定存在一个$x^*$满足$f(x^*)=x^*$
             \item 解唯一性：$x^*$是唯一的
             \item 求解方式（值迭代法）：考虑一个数列$\{x_k\}$，其中$x_{k+1}=f(x_k)$。当$k\rightarrow\infty$时$x_k\rightarrow x^*$。
         \end{itemize}
-    \end{block}
+    \end{theorem}
     贝尔曼最优公式是一个压缩映射（证明略）。
     \begin{itemize}
         \item 例：$x=0.5x$，$\{x_k\}=\{10, 5, 2.5,\cdots\}$
@@ -96,7 +96,7 @@
 
 \begin{frame}{贝尔曼最优公式}
     所以我们可以按照值迭代法的求解方式求出$v^*$，但它一定就是最高的状态价值吗？
-    \begin{theorem}
+    \begin{theorem}[贝尔曼最优定理]
         假设$v^*$是$v=\max_\pi(r_\pi+P_\pi v)$的唯一解，那么对于任何其他给定策略$\pi$的满足$v_\pi=r_\pi+\gamma P_\pi v_\pi$的$v_\pi$而言都有：
         \[
             v^*\geq v_\pi \quad \forall \pi
@@ -110,7 +110,7 @@
     \[
         \alert{\pi^*(s)}=\arg\underset{\pi}{\max}\sum_a\pi(a|s)\left[\sum_r p(r|s,a)r+\gamma\sum_{s'}p(s'|s,a)\alert{v^*(s')}\right]
     \]
-    \begin{theorem}
+    \begin{theorem}[贝尔曼最优定理]
         对于任何$s\in \mathcal{S}$，下列确定性策略都是最优策略：
         \[
             \pi^*(a|s)=
