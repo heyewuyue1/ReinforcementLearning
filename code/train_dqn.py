@@ -119,6 +119,7 @@ def train_dqn(env, episodes=1000, batch_size=32):
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
         if not done:
+            agent.update_target_model()
             print(f"Episode: {e}/{episodes}, Score: {total_reward}, Epsilon: {agent.epsilon:.2f}")
     agent.save(f"dqn_model_{e}.pth")
     # 训练结束后，绘制学习到的策略
