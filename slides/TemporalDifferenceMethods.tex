@@ -114,7 +114,7 @@
 \begin{frame}{时序差分方法：Sarsa}
     \begin{itemize}
         \item \textbf{为什么这个算法被称作Sarsa？}因为这个算法的每一步都涉及到序列$(s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1})$。Sarsa就是state-action-reward-state-action的简写形式。
-        \item \textbf{Sarsa算法和TD算法之间是什么关系？}我们可以直接把TD算法中估计状态价值的$v_(s)$替换成估计动作价值的$q_(s,a)$。所以Sarsa算法是TD算法用于估计动作价值的一个拓展。
+        \item \textbf{Sarsa算法和TD算法之间是什么关系？}我们可以直接把TD算法中估计状态价值的$v(s)$替换成估计动作价值的$q(s,a)$。所以Sarsa算法是TD算法用于估计动作价值的一个拓展。
         \item \textbf{Sarsa算法在数学上解决了什么？}Sarsa算法可以在\alert{无模型}但是\alert{有样本}的时候求解以下贝尔曼方程：
         \[
             q_\pi(s,a)=\mathbbm{E}[R+\gamma q_\pi(S',A')|s,a], \quad \forall s\in\mathcal{S}, a\in\mathcal{A}
