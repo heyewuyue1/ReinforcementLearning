@@ -314,7 +314,7 @@
 
 \begin{frame}{值近似Sarsa算法}
     \begin{algorithmic}[1]
-        \State \textbf{初始化：}一个对$w$可微的函数$\hat{v}(s,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
+        \State \textbf{初始化：}一个对$w$可微的函数$\hat{q}(s,a,w)$。初始化$w=w_0$。一个初始策略$\pi_0$。
         \State \textbf{目标 ：}找到一个让智能体从一个特定的起点$s_0$出发，到达终点的最优策略。
         \For{每一次生成轨迹}
             \State $a_0\leftarrow\pi_0(s_0)$
