@@ -189,7 +189,7 @@
 \begin{frame}{目标函数}
     正式定义问题：
     \begin{itemize}
-        \item $\v_\pi(s)$是状态价值的\alert{真实值}；$\hat{v}(s,w)$时状态价值的\alert{估计值}。
+        \item $\v_\pi(s)$是状态价值的\alert{真实值}；$\hat{v}(s,w)$是状态价值的\alert{估计值}。
         \item 我们的目标是找到一个最优的参数$w$，使得$\hat{v}(s,w)$尽可能的接近$\v_\pi(s)$。
     \end{itemize}
     为了找到最优的$w$，我们需要两步：
@@ -295,7 +295,6 @@
             w_{t+1}=w_t+\alpha_t(r_{t+1}+\gamma \hat{v}(s_{t+1},w_t)-\hat{v}(s_t,w_t))\nabla_w\hat{v}(s_t,w_t)
         \]
     \end{itemize}
-    数学上并不严谨，有兴趣的同学可以自行推导一下。问题出在3）当我们用估计值代替真实的价值之后，我们实际上优化的目标方程并不是1）。
 \end{frame}
 
 \begin{frame}{值近似Sarsa算法}
