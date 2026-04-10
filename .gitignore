@@ -33,3 +33,4 @@ latex.out/
 .DS_Store
 __pycache__/
 *.pth
+*.zip

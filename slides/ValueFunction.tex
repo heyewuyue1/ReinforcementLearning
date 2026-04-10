@@ -189,12 +189,12 @@
 \begin{frame}{目标函数}
     正式定义问题：
     \begin{itemize}
-        \item $\v_\pi(s)$是状态价值的\alert{真实值}；$\hat{v}(s,w)$是状态价值的\alert{估计值}。
-        \item 我们的目标是找到一个最优的参数$w$，使得$\hat{v}(s,w)$尽可能的接近$\v_\pi(s)$。
+        \item $v_\pi(s)$是状态价值的\alert{真实值}；$\hat{v}(s,w)$是状态价值的\alert{估计值}。
+        \item 我们的目标是找到一个最优的参数$w$，使得$\hat{v}(s,w)$尽可能的接近$v_\pi(s)$。
     \end{itemize}
     为了找到最优的$w$，我们需要两步：
     \begin{itemize}
-        \item 第一步：定义一个目标函数（损失函数）来量化$\hat{v}(s,w)$和$\v_\pi(s)$之间的差距。
+        \item 第一步：定义一个目标函数（损失函数）来量化$\hat{v}(s,w)$和$v_\pi(s)$之间的差距。
         \item 第二步：通过优化算法来最小化目标函数。
     \end{itemize}
     \alert{目标函数：
@@ -434,7 +434,7 @@
 \end{frame}
 
 \begin{frame}{Deep Q-Learning}
-    如何最小化这个目标函数？梯度下降法！
+    如何最小化这个目标函数？梯度下降法。
     \begin{itemize}
         \item 如何计算目标函数的梯度？
         \item 目标函数：

@@ -120,7 +120,7 @@ def train_dqn(env, episodes=1000, batch_size=32):
         if not done:
             agent.update_target_model()
             print(f"Episode: {e}/{episodes}, Score: {total_reward}, Epsilon: {agent.epsilon:.2f}")
-    agent.save(f"dqn_model_{e}.pth")
+    agent.save(f"model/dqn_model_{e}.pth")
     # 训练结束后，绘制学习到的策略
     policy_matrix = agent.get_policy(env)
     env.render()  # 显示策略
